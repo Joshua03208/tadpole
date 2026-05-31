@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@tadpole/config — Expo strict layer (apply AFTER expo/tsconfig.base)",
+  "//": "Intentionally does NOT set module/target/moduleResolution: Expo's own tsconfig.base governs those. This fragment only layers Tadpole's strictness + JSX on top.",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx"
+  }
+}

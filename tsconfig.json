@@ -1,0 +1,9 @@
+{
+  "//": "Root tsconfig for editor/IDE convenience. Each package/app owns its own tsconfig that extends @tadpole/config.",
+  "extends": "@tadpole/config/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "files": [],
+  "exclude": ["node_modules", "**/node_modules", "**/.next", "**/.expo", "**/dist"]
+}

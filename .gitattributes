@@ -1,0 +1,21 @@
+# Normalise line endings so a Windows dev drive doesn't break Metro/Babel
+# configs, shell scripts, or produce noisy CRLF diffs. LF everywhere by
+# default; CRLF only for Windows-native script types.
+* text=auto eol=lf
+
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary assets — never normalise.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.woff  binary
+*.woff2 binary
+*.ttf  binary
+*.otf  binary
+*.pdf  binary

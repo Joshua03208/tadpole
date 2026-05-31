@@ -1,0 +1,26 @@
+{
+  "name": "tadpole",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Tadpole — a platonic community app connecting fathers for friendship, peer support, and local meet-ups.",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "clean": "turbo run clean"
+  },
+  "devDependencies": {
+    "@tadpole/config": "workspace:*",
+    "@types/node": "25.9.1",
+    "prettier": "3.8.3",
+    "turbo": "2.9.16",
+    "typescript": "6.0.3"
+  }
+}

@@ -1,0 +1,3 @@
+-- Tadpole seed data.
+-- Intentionally empty in Phase 0. Seed rows for local/staging are added
+-- alongside the migrations that introduce their tables (Phase 1+).

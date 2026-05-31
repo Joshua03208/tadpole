@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand tokens as space-separated RGB channels — mirrors apps/web/app/globals.css
+   and packages/config/tailwind/preset.cjs so the brand is identical on both
+   platforms. */
+:root {
+  --bg: 242 239 232; /* #F2EFE8 cream */
+  --ink: 0 0 0; /* #000000 */
+  --accent: 62 124 90; /* #3E7C5A pond-green */
+
+  --success: 46 125 50;
+  --warning: 178 106 0;
+  --error: 179 38 30;
+  --info: 31 111 120;
+}

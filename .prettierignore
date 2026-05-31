@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+dist
+build
+.turbo
+.expo
+pnpm-lock.yaml
+packages/types/src/database.types.ts
+apps/mobile/ios
+apps/mobile/android
