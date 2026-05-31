@@ -285,11 +285,21 @@ Ship Phase 1 to real dads before building Phase 4. Revenue features on top of an
 - ✅ **Analytics:** Umami self-hosted (web) + PostHog EU Cloud (product). No GA4.
 - ✅ **Brand:** cream `#F2EFE8` + ink `#000000`, lowercase wordmark, tadpole mark.
 
+**Locked in — 2026-05-31 rebuild session:**
+- ✅ **Accent colour:** muted pond-green `#3E7C5A`, held as a single swappable `--accent` token (RGB-channel CSS var). Confirm exact hex vs the logo file + WCAG AA contrast on cream before final lock.
+- ✅ **Environments:** one UK/EU cloud Supabase project as **dev/staging** (RLS + the `handle_swipe` trigger validated against real cloud from the start); a separate **prod** project stood up at the pre-launch checkpoint (free tier = 2 projects). No local Docker stack.
+- ✅ **Moderation sequencing (two-tier):** the launch-blocking *capture* layer — report→queue, block/unmatch, suspend/ban state, audit log, soft-delete, roles, the persistent crisis "Get help now" surface — ships in the swipe+match+safety phase; the full moderator *dashboard UI* is the last phase.
+- ✅ **Phase ordering (reconciled with §12):** 0 scaffold → 1 backend → 2 auth/onboarding → 3 swipe+match+safety → 4 Activity Finder → 5 messaging → 6 monetisation → 7 marketplace (= affiliate commerce, §8) → 8 Knowledge Hub → 9 Wellness hub → 10 moderator dashboard. Areas are modelled **first-class in Phase 1** (shared by the swipe deck + Activity Finder); Knowledge Hub and Wellness hub are kept architecturally separable.
+- ✅ **Schema deviations from `tadpole_swipe_schema.sql`** (apply in the relevant migrations — these fix latent issues in the provided SQL):
+  1. `get_swipe_deck()` returns a **column-masked projection** (no `lat`/`lng`/geography) — the provided `select p.*` would expose precise location, violating the privacy non-negotiable.
+  2. The `role` column is **excluded from self-update** (changeable only via an admin-guarded `security definer` function that writes the audit log) — a plain owner-update policy would allow self-escalation to admin/moderator.
+  3. Replace naive `on delete cascade` with a **soft-delete + anonymise** account-deletion model that preserves separable safety/abuse evidence (SAFETY_POLICY §8) instead of hard-deleting swipes/matches/blocks/messages.
+
 **Still to settle:**
-1. **Accent colour** — pick one (a pond-green is the obvious nod to "tadpole") to sit alongside the cream/ink.
-2. **Crisis & moderation policy** — write the actual policy for the wellness/community features before Phase 2 (§9).
-3. **Legal** — privacy policy, terms, and a DPIA reviewed by someone qualified before launch.
+1. **Crisis & moderation policy** — finalise/sign off `SAFETY_POLICY.md` with a qualified safeguarding/legal reviewer before the swipe+match+safety phase goes public (and the crisis-protocol wording before the Wellness hub); re-verify the crisis helpline numbers at that point.
+2. **Legal** — privacy policy, terms, and a DPIA reviewed by someone qualified before launch; plus a UK Online Safety Act risk assessment and the chosen age-assurance method (self-declared DOB + verification seam is the working assumption — confirm with the reviewer).
+3. **Deferred product/payments decisions** — age-assurance method (Phase 2), precise-location/PostGIS model (Phase 1/3), freemium swipe limit N + Premium bundle (Phase 3/6), exact "marketplace" scope (affiliate redirect assumed; confirm before Phase 6/7), snapshot-only moderator access to messages (Phase 5), DSAR UX (Phase 2), mobile store-submission timing (Phase 5).
 
 ---
 
-*Next concrete step: I can write the Phase 0 setup — Turborepo config, both app shells, the Supabase schema + RLS as runnable SQL, and a Claude Code kickoff prompt to scaffold it all.*
+*Phase 0 (scaffold) complete — commit `736d316`: Turborepo + pnpm monorepo, Next.js 16 + Expo SDK 56 shells, shared Tailwind-v3 token preset, CI, env surface, git. Next concrete step: Phase 1 — backend & data integrity (profiles + RLS + 18+ gate, role guard, audit log, soft-delete model, first-class areas, generated types, RLS/pgTAP test harness) against the dev/staging cloud project.*
