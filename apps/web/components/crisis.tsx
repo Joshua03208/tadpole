@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { CRISIS_RESOURCES, type CrisisResource } from "@tadpole/core";
 
 function actionFor(a: CrisisResource["action"]): { href: string; label: string } {
@@ -8,7 +9,7 @@ function actionFor(a: CrisisResource["action"]): { href: string; label: string }
     const pretty = a.number === "116123" ? "116 123" : a.number === "0800585858" ? "0800 58 58 58" : a.number;
     return { href: `tel:${a.number}`, label: `Call ${pretty}` };
   }
-  return { href: `sms:${a.to}?&body=${encodeURIComponent(a.body)}`, label: `Text ${a.body} to ${a.to}` };
+  return { href: `sms:${a.to}?body=${encodeURIComponent(a.body)}`, label: `Text ${a.body} to ${a.to}` };
 }
 
 export function GetHelpButton() {
@@ -35,9 +36,10 @@ export function GetHelpButton() {
         get help now
       </button>
 
-      {open && (
-        <div
-          role="dialog"
+      {open &&
+        createPortal(
+          <div
+            role="dialog"
           aria-modal="true"
           aria-label="Get help now — crisis resources"
           className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 sm:items-center sm:p-6"
@@ -94,7 +96,8 @@ export function GetHelpButton() {
               })}
             </ul>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
