@@ -28,6 +28,9 @@ web-build/
 !.env.example
 *.local
 
+# MCP server config may contain an access token — never commit it.
+.mcp.json
+
 # Supabase CLI local artifacts
 /supabase/.branches/
 /supabase/.temp/
