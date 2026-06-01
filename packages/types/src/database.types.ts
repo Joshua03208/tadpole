@@ -205,6 +205,7 @@ export type Database = {
           display_name: string
           id: string
           interests: string[]
+          onboarded_at: string | null
           parenting_stage: string | null
           role: Database["public"]["Enums"]["user_role"]
           status: string
@@ -219,6 +220,7 @@ export type Database = {
           display_name: string
           id: string
           interests?: string[]
+          onboarded_at?: string | null
           parenting_stage?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: string
@@ -233,6 +235,7 @@ export type Database = {
           display_name?: string
           id?: string
           interests?: string[]
+          onboarded_at?: string | null
           parenting_stage?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           status?: string
