@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { router } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import {
   listActivities,
@@ -8,6 +9,7 @@ import {
   type AreaSummary,
   type CategoryItem,
 } from "@tadpole/core";
+import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/app-header";
 import { ActivityCard } from "@/components/activity-card";
@@ -36,6 +38,7 @@ function Chip({
 }
 
 export default function ActivitiesIndex() {
+  const { session } = useAuth();
   const [areas, setAreas] = useState<AreaSummary[] | null>(null);
   const [categories, setCategories] = useState<CategoryItem[] | null>(null);
   const [items, setItems] = useState<ActivityCardData[] | null>(null);
@@ -89,6 +92,20 @@ export default function ActivitiesIndex() {
               playgroups near you.
             </Text>
           </View>
+
+          {/* Calm guest nudge — the deck/matches/messages core stays gated. */}
+          {!session ? (
+            <Pressable
+              onPress={() => router.push("/sign-up")}
+              accessibilityRole="button"
+              className="rounded-2xl border border-accent/20 bg-accent/5 px-4 py-3 active:opacity-80"
+            >
+              <Text className="text-sm text-ink/70">
+                browsing as a guest —{" "}
+                <Text className="font-semibold text-accent">sign up to connect with other dads</Text>
+              </Text>
+            </Pressable>
+          ) : null}
 
           {error ? <Text className="text-sm text-error">{error}</Text> : null}
 

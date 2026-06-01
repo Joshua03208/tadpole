@@ -26,6 +26,7 @@ import { supabase } from "@/lib/supabase";
 import { MeetupSafetyNote } from "@/components/meetup-safety-note";
 import { ReportMessageSheet } from "@/components/report-message-sheet";
 import { GetHelpButton } from "@/components/crisis";
+import { Splash } from "@/components/splash";
 
 function timeLabel(iso: string): string {
   const d = new Date(iso);
@@ -160,7 +161,8 @@ export default function Conversation() {
     }
   }, [header]);
 
-  if (!authLoading && !session) return <Redirect href="/sign-in" />;
+  if (authLoading) return <Splash />;
+  if (!session) return <Redirect href="/sign-in" />;
 
   const otherName = header?.other?.displayName ?? "this dad";
 

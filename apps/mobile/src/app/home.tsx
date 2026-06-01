@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/app-header";
 import { Deck } from "@/components/deck";
+import { Splash } from "@/components/splash";
 
 export default function Home() {
   const { loading, session } = useAuth();
@@ -22,7 +23,8 @@ export default function Home() {
     };
   }, [session]);
 
-  if (!loading && !session) return <Redirect href="/sign-in" />;
+  if (loading) return <Splash />;
+  if (!session) return <Redirect href="/sign-in" />;
   if (onboarded === false) return <Redirect href="/onboarding" />;
 
   return (

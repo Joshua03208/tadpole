@@ -53,9 +53,21 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Logged-in users hitting the marketing landing go straight to their home.
+  // EXACT match only ("/" — not startsWith) so child routes stay untouched and
+  // "/" stays statically served to anon visitors and crawlers.
+  if (user && path === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/home";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|api/health).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|icon|opengraph-image|robots.txt|sitemap.xml|api/health).*)",
+  ],
 };

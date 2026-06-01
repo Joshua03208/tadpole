@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/app-header";
 import { ReportSheet } from "@/components/report-sheet";
+import { Splash } from "@/components/splash";
 
 const STAGE_LABELS: Record<string, string> = {
   expecting: "Expecting",
@@ -87,7 +88,8 @@ export default function Matches() {
     }, [session]),
   );
 
-  if (!loading && !session) return <Redirect href="/sign-in" />;
+  if (loading) return <Splash />;
+  if (!session) return <Redirect href="/sign-in" />;
 
   async function act(otherId: string, fn: () => Promise<void>) {
     setPendingId(otherId);

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { COST_TIER_LABELS, getActivity, type ActivityDetail } from "@tadpole/core";
+import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/app-header";
 import { ActivityCover } from "@/components/activity-cover";
@@ -93,6 +94,7 @@ export default function ActivityDetailScreen() {
 }
 
 function Detail({ activity }: { activity: ActivityDetail }) {
+  const { session } = useAuth();
   const costLabel = COST_TIER_LABELS[activity.costTier] ?? activity.costTier;
 
   return (
@@ -147,10 +149,21 @@ function Detail({ activity }: { activity: ActivityDetail }) {
         </View>
       ) : null}
 
-      {/* Read-only surface — saving/sharing is a placeholder for now. */}
-      <View className="rounded-lg bg-ink/10 px-4 py-3">
-        <Text className="text-center text-sm font-semibold text-ink/40">save · coming soon</Text>
-      </View>
+      {/* Guests get an actionable nudge into sign-up; signed-in dads see the
+          muted placeholder until saving ships. */}
+      {session ? (
+        <View className="rounded-lg bg-ink/10 px-4 py-3">
+          <Text className="text-center text-sm font-semibold text-ink/40">save · coming soon</Text>
+        </View>
+      ) : (
+        <Pressable
+          onPress={() => router.push("/sign-up")}
+          className="rounded-lg bg-accent px-4 py-3 active:opacity-80"
+          accessibilityRole="button"
+        >
+          <Text className="text-center text-sm font-semibold text-bg">sign up to save this place</Text>
+        </Pressable>
+      )}
 
       <MeetupSafetyNote />
     </View>

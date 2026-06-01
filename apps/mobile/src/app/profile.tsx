@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/app-header";
 import { GhostButton } from "@/components/ui";
+import { Splash } from "@/components/splash";
 
 const STAGE_LABELS: Record<string, string> = {
   expecting: "Expecting",
@@ -32,7 +33,8 @@ export default function ProfileScreen() {
     };
   }, [session]);
 
-  if (!loading && !session) return <Redirect href="/sign-in" />;
+  if (loading) return <Splash />;
+  if (!session) return <Redirect href="/sign-in" />;
   if (profile && !profile.onboarded_at) return <Redirect href="/onboarding" />;
 
   async function onSignOut() {

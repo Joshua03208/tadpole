@@ -39,7 +39,7 @@ export default function Index() {
   }, [session]);
 
   if (loading) return <Splash />;
-  if (!session) return <Redirect href="/sign-in" />;
+  if (!session) return <Redirect href="/welcome" />;
   if (onboarded === null) return <Splash />;
   return <Redirect href={onboarded ? "/home" : "/onboarding"} />;
 }
