@@ -78,7 +78,9 @@ export type SignInInput = z.infer<typeof signInSchema>;
 export const onboardingProfileSchema = z.object({
   displayName: displayNameSchema,
   parentingStage: z.enum(PARENTING_STAGES).nullable().optional(),
-  areaId: z.uuid().nullable().optional(),
+  // Coarse area: canonical label + normalized slug from the bundled UK places.
+  areaLabel: z.string().max(120).nullable().optional(),
+  areaSlug: z.string().max(120).nullable().optional(),
   bio: bioSchema.optional(),
 });
 export type OnboardingProfileInput = z.infer<typeof onboardingProfileSchema>;

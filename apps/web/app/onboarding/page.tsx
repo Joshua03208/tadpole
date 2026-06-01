@@ -6,9 +6,10 @@ import {
   completeOnboarding,
   getMyProfile,
   isOnboarded,
-  listAreas,
+  searchPlaces,
   setMyLocation,
   uploadAvatar,
+  type UkPlace,
 } from "@tadpole/core";
 import {
   PARENTING_STAGES,
@@ -16,7 +17,6 @@ import {
   displayNameSchema,
   type ParentingStage,
 } from "@tadpole/validation";
-import type { Area } from "@tadpole/types";
 import { getBrowserClient } from "@/lib/supabase/client";
 import { processAvatar } from "@/lib/avatar";
 import { Button, Field, FormError, Input, Select, Textarea } from "@/components/form";
@@ -37,10 +37,11 @@ export default function OnboardingPage() {
   const client = useMemo(() => getBrowserClient(), []);
   const [loading, setLoading] = useState(true);
   const [step, setStep] = useState(0);
-  const [areas, setAreas] = useState<Area[]>([]);
   const [displayName, setDisplayName] = useState("");
   const [parentingStage, setParentingStage] = useState<ParentingStage | "">("");
-  const [areaId, setAreaId] = useState<string>("");
+  const [areaQuery, setAreaQuery] = useState("");
+  const [selectedPlace, setSelectedPlace] = useState<UkPlace | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [bio, setBio] = useState("");
   const [avatarBody, setAvatarBody] = useState<ArrayBuffer | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -50,11 +51,16 @@ export default function OnboardingPage() {
   const [pending, setPending] = useState(false);
   const [locating, setLocating] = useState(false);
 
+  const suggestions = useMemo(
+    () => (showSuggestions && areaQuery.trim() ? searchPlaces(areaQuery, 8) : []),
+    [showSuggestions, areaQuery],
+  );
+
   useEffect(() => {
     let active = true;
     (async () => {
       try {
-        const [profile, areaRows] = await Promise.all([getMyProfile(client), listAreas(client)]);
+        const profile = await getMyProfile(client);
         if (!active) return;
         if (isOnboarded(profile)) {
           router.replace("/home");
@@ -63,7 +69,6 @@ export default function OnboardingPage() {
         if (profile?.display_name && profile.display_name !== "dad") {
           setDisplayName(profile.display_name);
         }
-        setAreas(areaRows);
       } catch {
         if (active) setError("Couldn't load your profile. Please refresh.");
       } finally {
@@ -115,14 +120,10 @@ export default function OnboardingPage() {
       setError("Location isn't available in this browser.");
       return;
     }
-    // Geolocation only works (and only prompts) in a secure context — https or
-    // localhost. On a LAN IP over http the browser blocks it with no prompt.
     if (!window.isSecureContext) {
       setError("Sharing location needs a secure connection (https or localhost).");
       return;
     }
-    // If permission was previously denied the browser won't re-prompt — detect
-    // that and tell the user how to re-enable, instead of a silent failure.
     try {
       const permissions = navigator.permissions;
       if (permissions?.query) {
@@ -166,13 +167,13 @@ export default function OnboardingPage() {
       await completeOnboarding(client, {
         displayName: displayName.trim(),
         parentingStage: parentingStage || null,
-        areaId: areaId || null,
+        areaLabel: selectedPlace?.name ?? null,
+        areaSlug: selectedPlace?.slug ?? null,
         bio: bio.trim() || undefined,
       });
       if (avatarBody) {
         await uploadAvatar(client, avatarBody, "image/jpeg");
       }
-      // Only write a location row if the user actively opted in.
       if (shareLocation && coords) {
         await setMyLocation(client, coords);
       }
@@ -209,17 +210,53 @@ export default function OnboardingPage() {
 
       {step === 1 && (
         <div className="flex flex-col gap-4">
-          <Field label="Where are you (roughly)?" htmlFor="area" hint="Only your area is shown to others — never an exact location.">
-            <Select id="area" value={areaId} onChange={(e) => setAreaId(e.target.value)}>
-              <option value="">Prefer not to say</option>
-              {areas.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                  {a.region ? ` · ${a.region}` : ""}
-                </option>
-              ))}
-            </Select>
-          </Field>
+          <div className="flex flex-col gap-1">
+            <span className="text-sm font-medium text-ink">Where are you (roughly)?</span>
+            <div className="relative">
+              <Input
+                value={areaQuery}
+                onChange={(e) => {
+                  setAreaQuery(e.target.value);
+                  setSelectedPlace(null);
+                  setShowSuggestions(true);
+                }}
+                placeholder="Start typing a town or city — e.g. Cardiff"
+                autoComplete="off"
+                aria-autocomplete="list"
+                aria-expanded={suggestions.length > 0}
+                role="combobox"
+              />
+              {suggestions.length > 0 && (
+                <ul className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-ink/15 bg-white shadow-lg">
+                  {suggestions.map((p) => (
+                    <li key={p.slug}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedPlace(p);
+                          setAreaQuery(p.name);
+                          setShowSuggestions(false);
+                        }}
+                        className="flex w-full items-baseline justify-between px-3 py-2 text-left hover:bg-accent/10"
+                      >
+                        <span className="text-ink">{p.name}</span>
+                        <span className="text-xs text-ink/40">{p.region}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <span className="text-xs text-ink/50">
+              Only your area is shown to others — never an exact location.
+            </span>
+            {selectedPlace ? (
+              <span className="text-xs text-accent">
+                Selected: {selectedPlace.name} · {selectedPlace.region}
+              </span>
+            ) : null}
+          </div>
+
           <Field label="Your stage of fatherhood" htmlFor="stage">
             <Select
               id="stage"

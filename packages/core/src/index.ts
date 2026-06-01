@@ -1,5 +1,6 @@
 export { createAnonClient } from "./supabase";
 export * from "./account";
+export * from "./uk-places";
 
 export type { SupabaseClient } from "@supabase/supabase-js";
 export type { Database, Json } from "@tadpole/types";

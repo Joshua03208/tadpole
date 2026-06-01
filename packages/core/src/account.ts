@@ -75,7 +75,8 @@ export async function completeOnboarding(
   const patch: Database["public"]["Tables"]["profiles"]["Update"] = {
     display_name: input.displayName,
     parenting_stage: input.parentingStage ?? null,
-    area_id: input.areaId ?? null,
+    area_label: input.areaLabel ?? null,
+    area_slug: input.areaSlug ?? null,
     bio: trimmedBio ? trimmedBio : null,
     onboarded_at: new Date().toISOString(),
   };

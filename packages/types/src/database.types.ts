@@ -198,6 +198,8 @@ export type Database = {
       profiles: {
         Row: {
           area_id: string | null
+          area_label: string | null
+          area_slug: string | null
           avatar_url: string | null
           bio: string | null
           created_at: string
@@ -213,6 +215,8 @@ export type Database = {
         }
         Insert: {
           area_id?: string | null
+          area_label?: string | null
+          area_slug?: string | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
@@ -228,6 +232,8 @@ export type Database = {
         }
         Update: {
           area_id?: string | null
+          area_label?: string | null
+          area_slug?: string | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string

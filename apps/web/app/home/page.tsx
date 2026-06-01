@@ -20,7 +20,7 @@ export default async function HomePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, bio, avatar_url, parenting_stage, created_at, area:areas(name, region)")
+    .select("display_name, bio, avatar_url, parenting_stage, created_at, area_label")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -28,8 +28,6 @@ export default async function HomePage() {
     .from("profile_locations")
     .select("id", { count: "exact", head: true })
     .eq("id", user.id);
-
-  const area = Array.isArray(profile?.area) ? profile?.area[0] : profile?.area;
 
   return (
     <main className="mx-auto max-w-md px-6 py-10">
@@ -43,11 +41,8 @@ export default async function HomePage() {
         )}
         <div>
           <h1 className="text-2xl font-semibold text-ink">{profile?.display_name}</h1>
-          {area ? (
-            <p className="text-sm text-ink/60">
-              {area.name}
-              {area.region ? ` · ${area.region}` : ""}
-            </p>
+          {profile?.area_label ? (
+            <p className="text-sm text-ink/60">{profile.area_label}</p>
           ) : null}
         </div>
       </div>

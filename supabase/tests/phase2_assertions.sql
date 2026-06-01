@@ -60,7 +60,8 @@ select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-1111111
 update public.profiles
    set display_name = 'Alan',
        parenting_stage = 'toddler',
-       area_id = 'a1a1a1a1-0000-0000-0000-000000000001',
+       area_label = 'Cardiff',
+       area_slug = 'cardiff',
        bio = 'dad of one, into hill walks',
        onboarded_at = now()
  where id = '11111111-1111-1111-1111-111111111111';
@@ -71,7 +72,7 @@ begin
   select * into p from public.profiles where id = '11111111-1111-1111-1111-111111111111';
   if p.display_name <> 'Alan' then raise exception 'FAIL[onboarding]: display_name not persisted'; end if;
   if p.parenting_stage <> 'toddler' then raise exception 'FAIL[onboarding]: stage not persisted'; end if;
-  if p.area_id <> 'a1a1a1a1-0000-0000-0000-000000000001' then raise exception 'FAIL[onboarding]: area not persisted'; end if;
+  if p.area_label <> 'Cardiff' or p.area_slug <> 'cardiff' then raise exception 'FAIL[onboarding]: area not persisted'; end if;
   if p.onboarded_at is null then raise exception 'FAIL[onboarding]: onboarded_at not set'; end if;
   raise notice 'PASS[onboarding]: onboarding persisted the profile (name/stage/area/onboarded_at)';
 end $$;

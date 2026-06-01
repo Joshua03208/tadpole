@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { Redirect, router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
-import { completeOnboarding, getMyProfile, isOnboarded, listAreas } from "@tadpole/core";
+import { completeOnboarding, getMyProfile, isOnboarded, searchPlaces, type UkPlace } from "@tadpole/core";
 import {
   PARENTING_STAGES,
   bioHasContactDetails,
   displayNameSchema,
   type ParentingStage,
 } from "@tadpole/validation";
-import type { Area } from "@tadpole/types";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { ErrorText, Field, GhostButton, PrimaryButton, Screen, TextField } from "@/components/ui";
@@ -36,27 +35,29 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
 export default function Onboarding() {
   const { loading, session } = useAuth();
   const [step, setStep] = useState(0);
-  const [areas, setAreas] = useState<Area[]>([]);
   const [displayName, setDisplayName] = useState("");
   const [parentingStage, setParentingStage] = useState<ParentingStage | null>(null);
-  const [areaId, setAreaId] = useState<string | null>(null);
+  const [areaQuery, setAreaQuery] = useState("");
+  const [selectedPlace, setSelectedPlace] = useState<UkPlace | null>(null);
   const [bio, setBio] = useState("");
   const [error, setError] = useState<string | undefined>();
   const [pending, setPending] = useState(false);
 
+  const suggestions = areaQuery.trim() && !selectedPlace ? searchPlaces(areaQuery, 6) : [];
+
   useEffect(() => {
     if (!session) return;
     let active = true;
-    (async () => {
-      const [profile, areaRows] = await Promise.all([getMyProfile(supabase), listAreas(supabase)]);
-      if (!active) return;
-      if (isOnboarded(profile)) {
-        router.replace("/home");
-        return;
-      }
-      if (profile?.display_name && profile.display_name !== "dad") setDisplayName(profile.display_name);
-      setAreas(areaRows);
-    })().catch(() => active && setError("Couldn't load your profile."));
+    getMyProfile(supabase)
+      .then((profile) => {
+        if (!active) return;
+        if (isOnboarded(profile)) {
+          router.replace("/home");
+          return;
+        }
+        if (profile?.display_name && profile.display_name !== "dad") setDisplayName(profile.display_name);
+      })
+      .catch(() => active && setError("Couldn't load your profile."));
     return () => {
       active = false;
     };
@@ -84,7 +85,8 @@ export default function Onboarding() {
       await completeOnboarding(supabase, {
         displayName: displayName.trim(),
         parentingStage,
-        areaId,
+        areaLabel: selectedPlace?.name ?? null,
+        areaSlug: selectedPlace?.slug ?? null,
         bio: bio.trim() || undefined,
       });
       router.replace("/home");
@@ -108,14 +110,40 @@ export default function Onboarding() {
         <View className="gap-5">
           <View className="gap-2">
             <Text className="text-sm font-medium text-ink">Where are you (roughly)?</Text>
-            <Text className="text-xs text-ink/50">Only your area is shown to others — never an exact location.</Text>
-            <View className="flex-row flex-wrap gap-2">
-              <Chip label="Prefer not to say" active={areaId === null} onPress={() => setAreaId(null)} />
-              {areas.map((a) => (
-                <Chip key={a.id} label={a.name} active={areaId === a.id} onPress={() => setAreaId(a.id)} />
-              ))}
-            </View>
+            <Text className="text-xs text-ink/50">
+              Start typing your town or city. Only your area is shown to others — never an exact location.
+            </Text>
+            <TextField
+              value={areaQuery}
+              onChangeText={(t) => {
+                setAreaQuery(t);
+                setSelectedPlace(null);
+              }}
+              placeholder="e.g. Cardiff"
+              autoCapitalize="words"
+              autoCorrect={false}
+            />
+            {suggestions.map((p) => (
+              <Pressable
+                key={p.slug}
+                onPress={() => {
+                  setSelectedPlace(p);
+                  setAreaQuery(p.name);
+                }}
+                className="rounded-lg border border-ink/10 px-3 py-2"
+              >
+                <Text className="text-ink">
+                  {p.name} <Text className="text-xs text-ink/40">· {p.region}</Text>
+                </Text>
+              </Pressable>
+            ))}
+            {selectedPlace ? (
+              <Text className="text-xs text-accent">
+                Selected: {selectedPlace.name} · {selectedPlace.region}
+              </Text>
+            ) : null}
           </View>
+
           <View className="gap-2">
             <Text className="text-sm font-medium text-ink">Your stage of fatherhood</Text>
             <View className="flex-row flex-wrap gap-2">
