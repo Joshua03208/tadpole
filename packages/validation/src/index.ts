@@ -131,3 +131,15 @@ export const reportSchema = z.object({
   detail: z.string().max(1000).optional(),
 });
 export type ReportInput = z.infer<typeof reportSchema>;
+
+// ---- messages --------------------------------------------------------------
+// Text-only. Mirrors the DB body CHECK (1..2000). Deliberately NO contact-detail
+// stripping: sharing a number with a chosen match to arrange a meet-up is normal
+// and expected (unlike the semi-public bio).
+export const MESSAGE_MAX = 2000;
+export const messageSchema = z
+  .string()
+  .trim()
+  .min(1, "Type a message.")
+  .max(MESSAGE_MAX, `Keep messages under ${MESSAGE_MAX} characters.`);
+export type MessageInput = z.infer<typeof messageSchema>;

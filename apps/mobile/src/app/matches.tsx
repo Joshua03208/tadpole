@@ -1,7 +1,13 @@
-import { useEffect, useState } from "react";
-import { Redirect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { Redirect, router, useFocusEffect } from "expo-router";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
-import { blockUser, listMatches, unmatchUser, type MatchListItem } from "@tadpole/core";
+import {
+  blockUser,
+  listMatches,
+  unmatchUser,
+  unreadCounts,
+  type MatchListItem,
+} from "@tadpole/core";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/app-header";
@@ -50,6 +56,7 @@ function Pill({
 export default function Matches() {
   const { loading, session } = useAuth();
   const [items, setItems] = useState<MatchListItem[] | null>(null);
+  const [unread, setUnread] = useState<Map<string, number>>(new Map());
   const [error, setError] = useState<string | undefined>();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [reporting, setReporting] = useState<{ id: string; name: string } | null>(null);
@@ -64,6 +71,21 @@ export default function Matches() {
       active = false;
     };
   }, [session]);
+
+  // Refetch unread counts whenever the screen regains focus (e.g. returning from
+  // a conversation that marked itself read), so badges clear. Non-fatal.
+  useFocusEffect(
+    useCallback(() => {
+      if (!session) return;
+      let active = true;
+      unreadCounts(supabase)
+        .then((c) => active && setUnread(c))
+        .catch(() => {});
+      return () => {
+        active = false;
+      };
+    }, [session]),
+  );
 
   if (!loading && !session) return <Redirect href="/sign-in" />;
 
@@ -106,6 +128,7 @@ export default function Matches() {
                     .join(" · ")
                 : "this dad is no longer available";
               const disabled = pendingId === m.otherId;
+              const unreadCount = unread.get(m.matchId) ?? 0;
               return (
                 <View key={m.matchId} className="rounded-2xl border border-ink/10 bg-white/50 p-4">
                   <View className="flex-row items-center gap-3">
@@ -126,9 +149,28 @@ export default function Matches() {
                         </Text>
                       ) : null}
                     </View>
+                    {unreadCount > 0 ? (
+                      <View
+                        accessibilityLabel={`${unreadCount} unread message${unreadCount === 1 ? "" : "s"}`}
+                        className="min-w-6 items-center justify-center rounded-full bg-accent px-2 py-0.5"
+                      >
+                        <Text className="text-xs font-semibold text-bg">
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
                   <View className="mt-3 flex-row flex-wrap items-center gap-2">
-                    <Pill label="message · soon" tone="muted" />
+                    {m.other ? (
+                      <Pill
+                        label="message"
+                        onPress={() =>
+                          router.push({ pathname: "/messages/[matchId]", params: { matchId: m.matchId } })
+                        }
+                      />
+                    ) : (
+                      <Pill label="message" tone="muted" />
+                    )}
                     <Pill
                       label="unmatch"
                       disabled={disabled}

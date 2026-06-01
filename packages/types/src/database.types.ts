@@ -248,6 +248,78 @@ export type Database = {
           },
         ]
       }
+      message_reads: {
+        Row: {
+          last_read_at: string
+          match_id: string
+          user_id: string
+        }
+        Insert: {
+          last_read_at?: string
+          match_id: string
+          user_id: string
+        }
+        Update: {
+          last_read_at?: string
+          match_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reads_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_reads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          match_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          match_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_locations: {
         Row: {
           id: string
@@ -374,6 +446,7 @@ export type Database = {
           reported_profile_id: string | null
           reporter_id: string | null
           severity: string
+          snapshot: Json | null
           status: string
           target_id: string | null
           target_type: string
@@ -387,6 +460,7 @@ export type Database = {
           reported_profile_id?: string | null
           reporter_id?: string | null
           severity?: string
+          snapshot?: Json | null
           status?: string
           target_id?: string | null
           target_type: string
@@ -400,6 +474,7 @@ export type Database = {
           reported_profile_id?: string | null
           reporter_id?: string | null
           severity?: string
+          snapshot?: Json | null
           status?: string
           target_id?: string | null
           target_type?: string
@@ -545,6 +620,10 @@ export type Database = {
         Args: { p_detail?: string; p_reason: string; p_reported: string }
         Returns: string
       }
+      report_message: {
+        Args: { p_detail?: string; p_message_id: string; p_reason: string }
+        Returns: string
+      }
       request_account_deletion: { Args: never; Returns: undefined }
       set_user_role: {
         Args: {
@@ -556,6 +635,13 @@ export type Database = {
       unmatch: {
         Args: { p_block?: boolean; p_other: string }
         Returns: undefined
+      }
+      unread_counts: {
+        Args: never
+        Returns: {
+          match_id: string
+          unread: number
+        }[]
       }
     }
     Enums: {

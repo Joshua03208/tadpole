@@ -22,7 +22,7 @@ export function Deck() {
   const [error, setError] = useState<string | undefined>();
   const [busy, setBusy] = useState(false);
   const [exitDir, setExitDir] = useState<"left" | "right" | null>(null);
-  const [match, setMatch] = useState<{ name: string; avatarUrl: string | null } | null>(null);
+  const [match, setMatch] = useState<{ matchId: string; name: string; avatarUrl: string | null } | null>(null);
   const [reporting, setReporting] = useState<DeckCard | null>(null);
 
   const top = cards[0];
@@ -64,7 +64,8 @@ export function Deck() {
         await new Promise((r) => setTimeout(r, 180)); // let the exit animation play
         setCards((prev) => prev.filter((c) => c.id !== card.id));
         setExitDir(null);
-        if (res.matched) setMatch({ name: card.display_name, avatarUrl: card.avatar_url });
+        if (res.matched && res.matchId)
+          setMatch({ matchId: res.matchId, name: card.display_name, avatarUrl: card.avatar_url });
         setCards((prev) => {
           if (prev.length <= 2) void refill();
           return prev;
@@ -216,7 +217,12 @@ export function Deck() {
       <p className="mt-3 text-center text-xs text-ink/40">use ← pass · like → · platonic, never dating</p>
 
       {match ? (
-        <MatchModal name={match.name} avatarUrl={match.avatarUrl} onClose={() => setMatch(null)} />
+        <MatchModal
+          matchId={match.matchId}
+          name={match.name}
+          avatarUrl={match.avatarUrl}
+          onClose={() => setMatch(null)}
+        />
       ) : null}
       {reporting ? (
         <ReportDialog

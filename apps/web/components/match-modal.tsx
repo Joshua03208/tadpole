@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export function MatchModal({
+  matchId,
   name,
   avatarUrl,
   onClose,
 }: {
+  matchId: string;
   name: string;
   avatarUrl: string | null;
   onClose: () => void;
@@ -54,15 +56,12 @@ export function MatchModal({
           )}
         </div>
 
-        <button
-          type="button"
-          disabled
-          title="Messaging arrives in the next phase"
-          aria-label="Messaging coming soon"
-          className="w-full cursor-not-allowed rounded-lg bg-ink/10 px-4 py-2.5 text-sm font-semibold text-ink/40"
+        <Link
+          href={`/messages/${matchId}`}
+          className="block w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-bg transition active:scale-[0.98] hover:bg-accent/90"
         >
-          message · coming soon
-        </button>
+          send a message
+        </Link>
 
         <div className="mt-3 flex gap-3">
           <button

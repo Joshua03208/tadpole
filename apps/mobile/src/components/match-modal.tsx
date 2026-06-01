@@ -4,10 +4,12 @@ import { Image, Modal, Pressable, Text, View } from "react-native";
 export function MatchModal({
   name,
   avatarUrl,
+  matchId,
   onClose,
 }: {
   name: string;
   avatarUrl: string | null;
+  matchId: string | null;
   onClose: () => void;
 }) {
   return (
@@ -30,9 +32,18 @@ export function MatchModal({
             )}
           </View>
 
-          <View className="w-full rounded-lg bg-ink/10 px-4 py-3">
-            <Text className="text-center text-sm font-semibold text-ink/40">message · coming soon</Text>
-          </View>
+          {matchId ? (
+            <Pressable
+              onPress={() => {
+                onClose();
+                router.push({ pathname: "/messages/[matchId]", params: { matchId } });
+              }}
+              accessibilityLabel={`Message ${name}`}
+              className="w-full rounded-lg bg-accent px-4 py-3 active:opacity-80"
+            >
+              <Text className="text-center text-sm font-semibold text-bg">send a message</Text>
+            </Pressable>
+          ) : null}
 
           <View className="mt-3 w-full flex-row gap-3">
             <Pressable
@@ -46,9 +57,13 @@ export function MatchModal({
                 onClose();
                 router.push("/matches");
               }}
-              className="flex-1 rounded-lg bg-accent px-4 py-3 active:opacity-80"
+              className={`flex-1 rounded-lg px-4 py-3 active:opacity-80 ${
+                matchId ? "border border-ink/15" : "bg-accent"
+              }`}
             >
-              <Text className="text-center text-sm font-semibold text-bg">view matches</Text>
+              <Text className={`text-center text-sm font-semibold ${matchId ? "text-ink" : "text-bg"}`}>
+                view matches
+              </Text>
             </Pressable>
           </View>
         </View>

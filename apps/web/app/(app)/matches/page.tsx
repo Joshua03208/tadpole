@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { blockUser, listMatches, unmatchUser, type MatchListItem } from "@tadpole/core";
+import Link from "next/link";
+import { blockUser, listMatches, unmatchUser, unreadCounts, type MatchListItem } from "@tadpole/core";
 import { getBrowserClient } from "@/lib/supabase/client";
 import { ReportDialog } from "@/components/report-dialog";
 
@@ -17,6 +18,7 @@ const STAGE_LABELS: Record<string, string> = {
 export default function MatchesPage() {
   const client = useMemo(() => getBrowserClient(), []);
   const [items, setItems] = useState<MatchListItem[] | null>(null);
+  const [unread, setUnread] = useState<Map<string, number>>(new Map());
   const [error, setError] = useState<string | undefined>();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [reporting, setReporting] = useState<{ id: string; name: string } | null>(null);
@@ -26,6 +28,10 @@ export default function MatchesPage() {
     listMatches(client)
       .then((d) => active && setItems(d))
       .catch(() => active && setError("Couldn't load your matches."));
+    // Unread counts are best-effort: a failure here must not blank the list.
+    unreadCounts(client)
+      .then((u) => active && setUnread(u))
+      .catch(() => {});
     return () => {
       active = false;
     };
@@ -84,30 +90,52 @@ export default function MatchesPage() {
                 .join(" · ")
             : "this dad is no longer available";
           const disabled = pendingId === m.otherId;
+          const unreadCount = unread.get(m.matchId) ?? 0;
           return (
             <li key={m.matchId} className="rounded-2xl border border-ink/10 bg-white/50 p-4">
               <div className="flex items-center gap-3">
-                {m.other?.avatarUrl ? (
-                  <img src={m.other.avatarUrl} alt="" className="h-12 w-12 rounded-full object-cover" />
-                ) : (
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 font-semibold text-accent">
-                    {name[0]?.toUpperCase() ?? "?"}
-                  </div>
-                )}
+                <div className="relative">
+                  {m.other?.avatarUrl ? (
+                    <img src={m.other.avatarUrl} alt="" className="h-12 w-12 rounded-full object-cover" />
+                  ) : (
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 font-semibold text-accent">
+                      {name[0]?.toUpperCase() ?? "?"}
+                    </div>
+                  )}
+                  {unreadCount > 0 ? (
+                    <span
+                      aria-hidden="true"
+                      className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[11px] font-semibold text-bg ring-2 ring-bg"
+                    >
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  ) : null}
+                </div>
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-ink">{name}</p>
                   {sub ? <p className="truncate text-xs text-ink/55">{sub}</p> : null}
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold">
-                <button
-                  type="button"
-                  disabled
-                  title="Messaging arrives in the next phase"
-                  className="cursor-not-allowed rounded-full bg-ink/10 px-3 py-1.5 text-ink/40"
-                >
-                  message · soon
-                </button>
+                {m.other ? (
+                  <Link
+                    href={`/messages/${m.matchId}`}
+                    className="rounded-full bg-accent px-3 py-1.5 text-bg transition active:scale-[0.98] hover:bg-accent/90"
+                  >
+                    {unreadCount > 0
+                      ? `message · ${unreadCount > 9 ? "9+" : unreadCount} new`
+                      : "message"}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    title="This dad is no longer available"
+                    className="cursor-not-allowed rounded-full bg-ink/10 px-3 py-1.5 text-ink/40"
+                  >
+                    message
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => act(m.otherId, () => unmatchUser(client, m.otherId))}

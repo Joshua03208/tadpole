@@ -155,7 +155,11 @@ export function Deck() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>();
   const [busy, setBusy] = useState(false);
-  const [match, setMatch] = useState<{ name: string; avatarUrl: string | null } | null>(null);
+  const [match, setMatch] = useState<{
+    name: string;
+    avatarUrl: string | null;
+    matchId: string | null;
+  } | null>(null);
   const [reporting, setReporting] = useState<DeckCard | null>(null);
   const cardRef = useRef<SwipeHandle>(null);
 
@@ -191,7 +195,8 @@ export function Deck() {
       setCards((prev) => prev.filter((c) => c.id !== card.id)); // it has flown off-screen
       try {
         const res = await recordSwipe(supabase, card.id, dir);
-        if (res.matched) setMatch({ name: card.display_name, avatarUrl: card.avatar_url });
+        if (res.matched)
+          setMatch({ name: card.display_name, avatarUrl: card.avatar_url, matchId: res.matchId });
         setCards((prev) => {
           if (prev.length <= 2) void refill();
           return prev;
@@ -302,7 +307,12 @@ export function Deck() {
       </View>
 
       {match ? (
-        <MatchModal name={match.name} avatarUrl={match.avatarUrl} onClose={() => setMatch(null)} />
+        <MatchModal
+          name={match.name}
+          avatarUrl={match.avatarUrl}
+          matchId={match.matchId}
+          onClose={() => setMatch(null)}
+        />
       ) : null}
       {reporting ? (
         <ReportSheet
