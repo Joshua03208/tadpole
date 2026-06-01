@@ -48,6 +48,7 @@ export default function OnboardingPage() {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [error, setError] = useState<string | undefined>();
   const [pending, setPending] = useState(false);
+  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -108,18 +109,53 @@ export default function OnboardingPage() {
     }
   }
 
-  function useMyLocation() {
+  async function useMyLocation() {
     setError(undefined);
-    if (!navigator.geolocation) {
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
       setError("Location isn't available in this browser.");
       return;
     }
+    // Geolocation only works (and only prompts) in a secure context — https or
+    // localhost. On a LAN IP over http the browser blocks it with no prompt.
+    if (!window.isSecureContext) {
+      setError("Sharing location needs a secure connection (https or localhost).");
+      return;
+    }
+    // If permission was previously denied the browser won't re-prompt — detect
+    // that and tell the user how to re-enable, instead of a silent failure.
+    try {
+      const permissions = navigator.permissions;
+      if (permissions?.query) {
+        const status = await permissions.query({ name: "geolocation" as PermissionName });
+        if (status.state === "denied") {
+          setError(
+            "Location is blocked for this site. Enable it in your browser's site settings, then try again — or skip this step.",
+          );
+          return;
+        }
+      }
+    } catch {
+      // Permissions API unavailable — fall through and let getCurrentPosition prompt.
+    }
+
+    setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setShareLocation(true);
+        setLocating(false);
       },
-      () => setError("We couldn't get your location. You can skip this."),
+      (err) => {
+        setLocating(false);
+        setError(
+          err.code === err.PERMISSION_DENIED
+            ? "You didn't allow location access. You can skip this step."
+            : err.code === err.TIMEOUT
+              ? "Getting your location timed out. Try again, or skip."
+              : "We couldn't get your location. You can skip this step.",
+        );
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 },
     );
   }
 
@@ -236,8 +272,8 @@ export default function OnboardingPage() {
           {shareLocation && coords ? (
             <p className="text-sm text-accent">Location captured. You can finish now.</p>
           ) : (
-            <Button type="button" variant="ghost" onClick={useMyLocation}>
-              Use my location
+            <Button type="button" variant="ghost" onClick={useMyLocation} disabled={locating}>
+              {locating ? "Requesting…" : "Use my location"}
             </Button>
           )}
         </div>
