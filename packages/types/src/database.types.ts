@@ -212,6 +212,102 @@ export type Database = {
         }
         Relationships: []
       }
+      guide_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      guides: {
+        Row: {
+          author_id: string | null
+          author_name: string | null
+          author_tagline: string | null
+          body: string | null
+          category_id: string
+          cover_path: string | null
+          created_at: string
+          id: string
+          published_at: string | null
+          schema_type: string
+          slug: string
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          author_name?: string | null
+          author_tagline?: string | null
+          body?: string | null
+          category_id: string
+          cover_path?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          schema_type?: string
+          slug: string
+          status?: string
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          author_name?: string | null
+          author_tagline?: string | null
+          body?: string | null
+          category_id?: string
+          cover_path?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          schema_type?: string
+          slug?: string
+          status?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guides_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guides_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "guide_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           created_at: string

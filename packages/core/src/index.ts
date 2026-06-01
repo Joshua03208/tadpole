@@ -5,6 +5,7 @@ export * from "./swipe";
 export * from "./crisis";
 export * from "./activities";
 export * from "./messages";
+export * from "./guides";
 
 export type { SupabaseClient } from "@supabase/supabase-js";
 export type { Database, Json, DeckCard } from "@tadpole/types";

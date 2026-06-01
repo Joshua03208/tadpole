@@ -1,17 +1,19 @@
 import type { MetadataRoute } from "next";
-import { getActivityParams, getAreaParams } from "@tadpole/core";
+import { getActivityParams, getAreaParams, getGuideParams } from "@tadpole/core";
 import { getAnonServerClient } from "@/lib/supabase/anon";
 
 const BASE = "https://tadpole.app";
 
 // The public, SEO-indexable surface: homepage, the Activity Finder index, every
-// area page and every published activity. Sessionless anon reads only — no user
-// data (docs/TADPOLE_PLAN.md §3).
+// area page and every published activity, plus the Wellbeing Guides index and
+// every published guide. Sessionless anon reads only — no user data
+// (docs/TADPOLE_PLAN.md §3).
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = getAnonServerClient();
-  const [areas, activities] = await Promise.all([
+  const [areas, activities, guides] = await Promise.all([
     getAreaParams(supabase),
     getActivityParams(supabase),
+    getGuideParams(supabase),
   ]);
 
   const now = new Date();
@@ -25,6 +27,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${BASE}/activities`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE}/guides`,
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
@@ -43,6 +51,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const { area, slug } of activities) {
     entries.push({
       url: `${BASE}/activities/${area}/${slug}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    });
+  }
+
+  for (const { slug } of guides) {
+    entries.push({
+      url: `${BASE}/guides/${slug}`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.6,

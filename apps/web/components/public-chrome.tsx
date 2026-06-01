@@ -28,6 +28,12 @@ export function PublicHeader() {
           explore
         </Link>
         <Link
+          href="/guides"
+          className="rounded-full px-3 py-1.5 text-ink/70 transition hover:bg-ink/5 hover:text-ink"
+        >
+          guides
+        </Link>
+        <Link
           href="/login"
           className="rounded-full px-3 py-1.5 text-ink/60 transition hover:bg-ink/5 hover:text-ink"
         >
@@ -55,6 +61,15 @@ export function PublicFooter() {
               className="rounded-full px-2.5 py-1 transition hover:bg-ink/5 hover:text-ink"
             >
               explore
+            </Link>
+            <span aria-hidden="true" className="text-ink/25">
+              ·
+            </span>
+            <Link
+              href="/guides"
+              className="rounded-full px-2.5 py-1 transition hover:bg-ink/5 hover:text-ink"
+            >
+              guides
             </Link>
             <span aria-hidden="true" className="text-ink/25">
               ·

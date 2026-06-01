@@ -7,13 +7,15 @@ const NAV = [
   { href: "/home", label: "deck" },
   { href: "/matches", label: "matches" },
   { href: "/activities", label: "explore" },
+  { href: "/guides", label: "guides" },
   { href: "/profile", label: "profile" },
 ] as const;
 
-// "explore" stays highlighted across the whole /activities subtree (list +
+// "explore" and "guides" stay highlighted across their whole subtrees (list +
 // detail); the other tabs are single screens, so they match exactly.
 function isActive(href: string, path: string) {
-  if (href === "/activities") return path === href || path.startsWith(`${href}/`);
+  if (href === "/activities" || href === "/guides")
+    return path === href || path.startsWith(`${href}/`);
   return path === href;
 }
 
@@ -40,6 +42,15 @@ function PublicHeader({ path }: { path: string }) {
             }`}
           >
             explore
+          </Text>
+        </Link>
+        <Link href="/guides" asChild>
+          <Text
+            className={`text-sm active:opacity-70 ${
+              isActive("/guides", path) ? "font-semibold text-ink" : "text-ink/50"
+            }`}
+          >
+            guides
           </Text>
         </Link>
       </View>
