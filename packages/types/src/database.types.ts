@@ -355,9 +355,60 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      immediate_risk_reports: {
+        Row: {
+          created_at: string | null
+          detail: string | null
+          id: string | null
+          reason: string | null
+          reported_profile_id: string | null
+          reporter_id: string | null
+          severity: string | null
+          status: string | null
+          target_type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          detail?: string | null
+          id?: string | null
+          reason?: string | null
+          reported_profile_id?: string | null
+          reporter_id?: string | null
+          severity?: string | null
+          status?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          detail?: string | null
+          id?: string | null
+          reason?: string | null
+          reported_profile_id?: string | null
+          reporter_id?: string | null
+          severity?: string | null
+          status?: string | null
+          target_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_reported_profile_id_fkey"
+            columns: ["reported_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      block_user: { Args: { p_other: string }; Returns: undefined }
       current_app_role: {
         Args: never
         Returns: Database["public"]["Enums"]["user_role"]
@@ -381,6 +432,10 @@ export type Database = {
       }
       has_block_with: { Args: { p_other: string }; Returns: boolean }
       is_moderator: { Args: never; Returns: boolean }
+      report_and_block: {
+        Args: { p_detail?: string; p_reason: string; p_reported: string }
+        Returns: string
+      }
       request_account_deletion: { Args: never; Returns: undefined }
       set_user_role: {
         Args: {

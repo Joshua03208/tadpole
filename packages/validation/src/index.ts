@@ -91,3 +91,43 @@ export const locationSchema = z.object({
   lng: z.number().min(-180).max(180),
 });
 export type LocationInput = z.infer<typeof locationSchema>;
+
+// ---- reports ---------------------------------------------------------------
+// Mirrors the DB reports_reason CHECK. `immediate` reasons auto-escalate to
+// severity 'immediate' server-side (child_safety / self_harm / threats).
+export const REPORT_REASON_VALUES = [
+  "harassment",
+  "threats",
+  "hate",
+  "sexual_solicitation",
+  "child_safety",
+  "self_harm",
+  "scam",
+  "spam",
+  "impersonation",
+  "other",
+] as const;
+export type ReportReason = (typeof REPORT_REASON_VALUES)[number];
+
+export const REPORT_REASONS: ReadonlyArray<{
+  value: ReportReason;
+  label: string;
+  immediate?: boolean;
+}> = [
+  { value: "harassment", label: "Harassment or bullying" },
+  { value: "threats", label: "Threats or intimidation", immediate: true },
+  { value: "child_safety", label: "Child-safety concern", immediate: true },
+  { value: "self_harm", label: "Self-harm or suicide concern", immediate: true },
+  { value: "hate", label: "Hateful content" },
+  { value: "sexual_solicitation", label: "Sexual or romantic solicitation" },
+  { value: "scam", label: "Scam or fraud" },
+  { value: "spam", label: "Spam" },
+  { value: "impersonation", label: "Impersonation / fake profile" },
+  { value: "other", label: "Something else" },
+];
+
+export const reportSchema = z.object({
+  reason: z.enum(REPORT_REASON_VALUES),
+  detail: z.string().max(1000).optional(),
+});
+export type ReportInput = z.infer<typeof reportSchema>;
