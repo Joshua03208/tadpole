@@ -17,6 +17,8 @@ export type Swipe = Database["public"]["Tables"]["swipes"]["Row"];
 export type Match = Database["public"]["Tables"]["matches"]["Row"];
 export type Block = Database["public"]["Tables"]["blocks"]["Row"];
 export type Report = Database["public"]["Tables"]["reports"]["Row"];
+export type Category = Database["public"]["Tables"]["categories"]["Row"];
+export type Activity = Database["public"]["Tables"]["activities"]["Row"];
 
 // A masked deck card — exactly what get_swipe_deck returns (no lat/lng).
 export type DeckCard =

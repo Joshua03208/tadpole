@@ -1,4 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "tadpole",
+    description:
+      "For dads — friendship, peer support, and local meet-ups. Platonic, never dating.",
+    url: "https://tadpole.app",
+    siteName: "tadpole",
+    type: "website",
+    locale: "en_GB",
+  },
+};
 
 export default function HomePage() {
   return (

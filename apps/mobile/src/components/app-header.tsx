@@ -5,8 +5,16 @@ import { GetHelpButton } from "@/components/crisis";
 const NAV = [
   { href: "/home", label: "deck" },
   { href: "/matches", label: "matches" },
+  { href: "/activities", label: "explore" },
   { href: "/profile", label: "profile" },
 ] as const;
+
+// "explore" stays highlighted across the whole /activities subtree (list +
+// detail); the other tabs are single screens, so they match exactly.
+function isActive(href: string, path: string) {
+  if (href === "/activities") return path === href || path.startsWith(`${href}/`);
+  return path === href;
+}
 
 export function AppHeader() {
   const path = usePathname();
@@ -18,7 +26,7 @@ export function AppHeader() {
         </Text>
         {NAV.map((n) => (
           <Link key={n.href} href={n.href} asChild>
-            <Text className={`text-sm ${path === n.href ? "font-semibold text-ink" : "text-ink/50"}`}>
+            <Text className={`text-sm ${isActive(n.href, path) ? "font-semibold text-ink" : "text-ink/50"}`}>
               {n.label}
             </Text>
           </Link>

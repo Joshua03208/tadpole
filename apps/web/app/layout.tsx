@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   description:
     "Tadpole connects dads for friendship, peer support, and local meet-ups. Platonic — not a dating app.",
   applicationName: "tadpole",
+  // Lets Twitter use the inherited file-based opengraph-image as a large card.
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

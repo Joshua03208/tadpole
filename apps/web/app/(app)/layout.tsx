@@ -29,6 +29,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <Link href="/home" className="rounded-full px-3 py-1.5 text-ink/70 transition hover:bg-ink/5 hover:text-ink">
             deck
           </Link>
+          <Link href="/activities" className="rounded-full px-3 py-1.5 text-ink/70 transition hover:bg-ink/5 hover:text-ink">
+            explore
+          </Link>
           <Link href="/matches" className="rounded-full px-3 py-1.5 text-ink/70 transition hover:bg-ink/5 hover:text-ink">
             matches
           </Link>

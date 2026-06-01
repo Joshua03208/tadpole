@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      activities: {
+        Row: {
+          address: string | null
+          area_id: string
+          booking_url: string | null
+          category_id: string
+          cost_tier: string
+          cover_path: string | null
+          created_at: string
+          description: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          published_at: string | null
+          slug: string
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          area_id: string
+          booking_url?: string | null
+          category_id: string
+          cost_tier?: string
+          cover_path?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          published_at?: string | null
+          slug: string
+          status?: string
+          summary: string
+          title: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          area_id?: string
+          booking_url?: string | null
+          category_id?: string
+          cost_tier?: string
+          cover_path?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          published_at?: string | null
+          slug?: string
+          status?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "areas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       areas: {
         Row: {
           created_at: string
@@ -103,6 +181,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          schema_type: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          schema_type?: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          schema_type?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
       }
       matches: {
         Row: {
