@@ -39,6 +39,43 @@ jobs:
       - name: Build web
         run: pnpm --filter @tadpole/web build
 
-  # Phase 1 adds a `migrations` job here: apply supabase/migrations against the
-  # staging project (or a Supabase preview branch), run the pgTAP/RLS test
-  # harness, and fail the build on any RLS or security-definer regression.
+  db-tests:
+    name: migrations · RLS assertions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # This job runs the migrations + the RLS/security assertion harness against
+      # a throwaway local Supabase stack (Docker) — fully independent of any cloud
+      # project. It activates once `supabase init` has produced supabase/config.toml
+      # (a one-off done when the CLI is first set up). Until then it is a no-op so
+      # CI stays green.
+      - name: Check for supabase/config.toml
+        id: precheck
+        run: |
+          if [ -f supabase/config.toml ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::supabase/config.toml not present yet — DB test job is a no-op until 'supabase init' is committed."
+          fi
+
+      - name: Install Supabase CLI
+        if: steps.precheck.outputs.ready == 'true'
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase (applies supabase/migrations + seed)
+        if: steps.precheck.outputs.ready == 'true'
+        run: supabase start
+
+      - name: Run Phase 1 RLS / security assertions
+        if: steps.precheck.outputs.ready == 'true'
+        run: |
+          psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" \
+            -v ON_ERROR_STOP=1 -f supabase/tests/phase1_assertions.sql
+
+      - name: Stop local Supabase
+        if: always() && steps.precheck.outputs.ready == 'true'
+        run: supabase stop
