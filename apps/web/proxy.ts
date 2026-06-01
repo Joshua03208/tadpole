@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const PROTECTED = ["/home", "/onboarding"];
+const PROTECTED = ["/home", "/matches", "/profile", "/onboarding"];
 const AUTH_ROUTES = ["/login", "/signup"];
 
 // Next 16 "proxy" convention (formerly middleware): refreshes the Supabase

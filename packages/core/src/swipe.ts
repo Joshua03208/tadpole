@@ -6,12 +6,12 @@ type Client = SupabaseClient<Database>;
 // ---- the deck --------------------------------------------------------------
 export async function getDeck(
   client: Client,
-  opts?: { limit?: number; parentingStage?: string | null; areaId?: string | null },
+  opts?: { limit?: number; parentingStage?: string | null; areaSlug?: string | null },
 ): Promise<DeckCard[]> {
   const { data, error } = await client.rpc("get_swipe_deck", {
     p_limit: opts?.limit ?? 20,
     p_parenting_stage: opts?.parentingStage ?? undefined,
-    p_area_id: opts?.areaId ?? undefined,
+    p_area_slug: opts?.areaSlug ?? undefined,
   });
   if (error) throw error;
   return data ?? [];
@@ -51,6 +51,7 @@ export async function recordSwipe(
 export type MatchListItem = {
   matchId: string;
   createdAt: string;
+  otherId: string;
   other: {
     id: string;
     displayName: string;
@@ -85,6 +86,7 @@ export async function listMatches(client: Client): Promise<MatchListItem[]> {
     return {
       matchId: m.id,
       createdAt: m.created_at,
+      otherId,
       other: p
         ? {
             id: p.id,

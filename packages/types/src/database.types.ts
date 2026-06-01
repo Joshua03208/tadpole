@@ -415,12 +415,13 @@ export type Database = {
       }
       get_swipe_deck: {
         Args: {
-          p_area_id?: string
+          p_area_slug?: string
           p_limit?: number
           p_parenting_stage?: string
         }
         Returns: {
-          area_id: string
+          area_label: string
+          area_slug: string
           avatar_url: string
           bio: string
           created_at: string

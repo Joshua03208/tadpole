@@ -11,7 +11,7 @@ const STAGE_LABELS: Record<string, string> = {
   multiple: "Multiple kids",
 };
 
-export default async function HomePage() {
+export default async function ProfilePage() {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -20,7 +20,7 @@ export default async function HomePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, bio, avatar_url, parenting_stage, created_at, area_label")
+    .select("display_name, bio, avatar_url, parenting_stage, area_label")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -41,9 +41,7 @@ export default async function HomePage() {
         )}
         <div>
           <h1 className="text-2xl font-semibold text-ink">{profile?.display_name}</h1>
-          {profile?.area_label ? (
-            <p className="text-sm text-ink/60">{profile.area_label}</p>
-          ) : null}
+          {profile?.area_label ? <p className="text-sm text-ink/60">{profile.area_label}</p> : null}
         </div>
       </div>
 
@@ -66,11 +64,12 @@ export default async function HomePage() {
         </div>
       </dl>
 
-      <p className="mt-8 rounded-lg border border-ink/10 bg-white/40 px-4 py-3 text-xs text-ink/60">
-        Your profile is set up. The swipe deck and connecting with other dads arrives in the next phase.
-      </p>
-
-      <div className="mt-10 border-t border-ink/10 pt-6">
+      <div className="mt-10 flex flex-col gap-4 border-t border-ink/10 pt-6">
+        <form action="/auth/signout" method="post">
+          <button type="submit" className="text-sm text-ink/60 transition hover:text-ink">
+            sign out
+          </button>
+        </form>
         <DeleteAccount />
       </div>
     </main>

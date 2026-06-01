@@ -5,7 +5,7 @@ export * from "./swipe";
 export * from "./crisis";
 
 export type { SupabaseClient } from "@supabase/supabase-js";
-export type { Database, Json } from "@tadpole/types";
+export type { Database, Json, DeckCard } from "@tadpole/types";
 
 // NOTE: createServiceClient is deliberately NOT re-exported here. Import it from
 // "@tadpole/core/server" in server-only code so the service_role path can never
