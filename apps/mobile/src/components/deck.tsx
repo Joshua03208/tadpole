@@ -300,7 +300,7 @@ export function Deck() {
               busy ? "opacity-50" : ""
             }`}
           >
-            <Text className="text-sm font-semibold text-bg">hi</Text>
+            <Text style={{ fontSize: 26 }}>👋</Text>
           </Pressable>
         </View>
         <Text className="mt-3 text-center text-xs text-ink/40">swipe or tap · platonic, never dating</Text>

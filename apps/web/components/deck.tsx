@@ -206,15 +206,28 @@ export function Deck() {
           type="button"
           onClick={() => swipe("like")}
           disabled={busy}
-          aria-label="Like (right arrow)"
+          aria-label="Say hi (right arrow)"
           className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-bg transition active:scale-95 hover:bg-accent/90 disabled:opacity-50"
         >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 21s-7.5-4.6-10-9.3C.4 8.3 2 5 5.2 5c2 0 3.3 1.2 4 2.3C9.8 6.2 11.2 5 13.2 5 16.4 5 18 8.3 16.4 11.7 14 16.4 12 21 12 21z" />
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2" />
+            <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
+            <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
+            <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
           </svg>
         </button>
       </div>
-      <p className="mt-3 text-center text-xs text-ink/40">use ← pass · like → · platonic, never dating</p>
+      <p className="mt-3 text-center text-xs text-ink/40">use ← pass · say hi → · platonic, never dating</p>
 
       {match ? (
         <MatchModal
