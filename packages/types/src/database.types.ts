@@ -715,6 +715,20 @@ export type Database = {
       }
       has_block_with: { Args: { p_other: string }; Returns: boolean }
       is_moderator: { Args: never; Returns: boolean }
+      recent_conversations: {
+        Args: { p_limit?: number }
+        Returns: {
+          area_label: string
+          avatar_url: string
+          display_name: string
+          last_at: string
+          last_body: string
+          last_sender_id: string
+          match_id: string
+          other_id: string
+          unread: number
+        }[]
+      }
       report_and_block: {
         Args: { p_detail?: string; p_reason: string; p_reported: string }
         Returns: string

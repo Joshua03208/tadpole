@@ -121,3 +121,41 @@ export async function unreadCounts(client: Client): Promise<Map<string, number>>
   for (const row of data ?? []) map.set(row.match_id, Number(row.unread));
   return map;
 }
+
+// ---- recent conversations ---------------------------------------------------
+export type RecentConversation = {
+  matchId: string;
+  otherId: string;
+  displayName: string;
+  avatarUrl: string | null;
+  areaLabel: string | null;
+  lastBody: string | null;
+  lastAt: string | null;
+  lastSenderId: string | null;
+  unread: number;
+};
+
+// The caller's matches with the other dad's profile, latest message and unread
+// count in ONE round trip (vs listMatches + unreadCounts + per-match queries).
+// Backed by the security-invoker recent_conversations() RPC — RLS does all the
+// gating. Ordered by most recent activity.
+export async function listRecentConversations(
+  client: Client,
+  opts?: { limit?: number },
+): Promise<RecentConversation[]> {
+  const { data, error } = await client.rpc("recent_conversations", {
+    p_limit: opts?.limit ?? 8,
+  });
+  if (error) throw error;
+  return (data ?? []).map((row) => ({
+    matchId: row.match_id,
+    otherId: row.other_id,
+    displayName: row.display_name,
+    avatarUrl: row.avatar_url,
+    areaLabel: row.area_label,
+    lastBody: row.last_body,
+    lastAt: row.last_at,
+    lastSenderId: row.last_sender_id,
+    unread: Number(row.unread),
+  }));
+}
