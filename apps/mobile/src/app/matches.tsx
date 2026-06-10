@@ -1,12 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Redirect, router, useFocusEffect } from "expo-router";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import {
   blockUser,
-  listMatches,
+  listRecentConversations,
   unmatchUser,
-  unreadCounts,
-  type MatchListItem,
+  type RecentConversation,
 } from "@tadpole/core";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -14,14 +13,16 @@ import { AppHeader } from "@/components/app-header";
 import { ReportSheet } from "@/components/report-sheet";
 import { Splash } from "@/components/splash";
 
-const STAGE_LABELS: Record<string, string> = {
-  expecting: "Expecting",
-  newborn: "Newborn",
-  infant: "Infant",
-  toddler: "Toddler",
-  child: "Child 4y+",
-  multiple: "Multiple kids",
-};
+// Compact relative time for the conversation list ("now", "5m", "3h", "2d", "1w").
+function fmtAgo(iso: string): string {
+  const mins = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
+  if (mins < 1) return "now";
+  if (mins < 60) return `${mins}m`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  return days < 7 ? `${days}d` : `${Math.floor(days / 7)}w`;
+}
 
 function Pill({
   label,
@@ -32,56 +33,49 @@ function Pill({
   label: string;
   onPress?: () => void;
   disabled?: boolean;
-  tone?: "ghost" | "danger" | "muted";
+  tone?: "ghost" | "danger";
 }) {
-  const base = "rounded-full px-3 py-1.5";
-  const styles =
-    tone === "muted"
-      ? "bg-ink/10"
-      : tone === "danger"
-        ? ""
-        : "border border-ink/15";
-  const text =
-    tone === "muted" ? "text-ink/40" : tone === "danger" ? "text-error" : "text-ink/70";
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled || tone === "muted"}
-      className={`${base} ${styles} active:opacity-70 ${disabled ? "opacity-50" : ""}`}
+      disabled={disabled}
+      className={`rounded-full px-3 py-1.5 ${tone === "ghost" ? "border border-ink/15" : ""} active:opacity-70 ${
+        disabled ? "opacity-50" : ""
+      }`}
     >
-      <Text className={`text-xs font-semibold ${text}`}>{label}</Text>
+      <Text className={`text-xs font-semibold ${tone === "danger" ? "text-error" : "text-ink/70"}`}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
 
 export default function Matches() {
   const { loading, session } = useAuth();
-  const [items, setItems] = useState<MatchListItem[] | null>(null);
-  const [unread, setUnread] = useState<Map<string, number>>(new Map());
+  const [items, setItems] = useState<RecentConversation[] | null>(null);
   const [error, setError] = useState<string | undefined>();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [reporting, setReporting] = useState<{ id: string; name: string } | null>(null);
+  const hasLoaded = useRef(false);
 
-  useEffect(() => {
-    if (!session) return;
-    let active = true;
-    listMatches(supabase)
-      .then((d) => active && setItems(d))
-      .catch(() => active && setError("Couldn't load your matches."));
-    return () => {
-      active = false;
-    };
-  }, [session]);
-
-  // Refetch unread counts whenever the screen regains focus (e.g. returning from
-  // a conversation that marked itself read), so badges clear. Non-fatal.
+  // One round trip (matches + last message + unread), refetched whenever the
+  // screen regains focus so snippets, order and badges stay fresh — e.g. after
+  // returning from a conversation that marked itself read. A failed background
+  // refresh keeps the list we already have.
   useFocusEffect(
     useCallback(() => {
       if (!session) return;
       let active = true;
-      unreadCounts(supabase)
-        .then((c) => active && setUnread(c))
-        .catch(() => {});
+      listRecentConversations(supabase, { limit: 50 })
+        .then((d) => {
+          if (!active) return;
+          hasLoaded.current = true;
+          setItems(d);
+          setError(undefined);
+        })
+        .catch(() => {
+          if (active && !hasLoaded.current) setError("Couldn't load your matches.");
+        });
       return () => {
         active = false;
       };
@@ -96,7 +90,7 @@ export default function Matches() {
     setError(undefined);
     try {
       await fn();
-      setItems((prev) => (prev ? prev.filter((m) => m.otherId !== otherId) : prev));
+      setItems((prev) => (prev ? prev.filter((c) => c.otherId !== otherId) : prev));
     } catch {
       setError("Couldn't complete that. Please try again.");
     } finally {
@@ -122,75 +116,73 @@ export default function Matches() {
               </Text>
             </View>
           ) : (
-            (items ?? []).map((m) => {
-              const name = m.other?.displayName ?? "member unavailable";
-              const sub = m.other
-                ? [m.other.areaLabel, m.other.parentingStage ? STAGE_LABELS[m.other.parentingStage] : null]
-                    .filter(Boolean)
-                    .join(" · ")
-                : "this dad is no longer available";
-              const disabled = pendingId === m.otherId;
-              const unreadCount = unread.get(m.matchId) ?? 0;
+            (items ?? []).map((c) => {
+              const disabled = pendingId === c.otherId;
+              const snippet = c.lastBody
+                ? `${c.lastSenderId === c.otherId ? "" : "you: "}${c.lastBody}`
+                : (c.areaLabel ?? "say hello 👋");
               return (
-                <View key={m.matchId} className="rounded-2xl border border-ink/10 bg-white/50 p-4">
-                  <View className="flex-row items-center gap-3">
-                    {m.other?.avatarUrl ? (
-                      <Image source={{ uri: m.other.avatarUrl }} className="h-12 w-12 rounded-full" />
+                <View key={c.matchId} className="rounded-2xl border border-ink/10 bg-white/50 p-4">
+                  <Pressable
+                    onPress={() =>
+                      router.push({ pathname: "/messages/[matchId]", params: { matchId: c.matchId } })
+                    }
+                    accessibilityLabel={`Open conversation with ${c.displayName}`}
+                    className="flex-row items-center gap-3 active:opacity-80"
+                  >
+                    {c.avatarUrl ? (
+                      <Image source={{ uri: c.avatarUrl }} className="h-12 w-12 rounded-full" />
                     ) : (
                       <View className="h-12 w-12 items-center justify-center rounded-full bg-accent/15">
-                        <Text className="font-semibold text-accent">{name[0]?.toUpperCase() ?? "?"}</Text>
+                        <Text className="font-semibold text-accent">
+                          {c.displayName[0]?.toUpperCase() ?? "?"}
+                        </Text>
                       </View>
                     )}
                     <View className="flex-1">
-                      <Text className="font-semibold text-ink" numberOfLines={1}>
-                        {name}
-                      </Text>
-                      {sub ? (
-                        <Text className="text-xs text-ink/55" numberOfLines={1}>
-                          {sub}
+                      <View className="flex-row items-center gap-2">
+                        <Text className="flex-1 font-semibold text-ink" numberOfLines={1}>
+                          {c.displayName}
                         </Text>
-                      ) : null}
+                        {c.lastAt ? (
+                          <Text className="text-[11px] text-ink/40">{fmtAgo(c.lastAt)}</Text>
+                        ) : null}
+                      </View>
+                      <Text
+                        className={`text-xs ${c.unread > 0 ? "font-semibold text-ink" : "text-ink/55"}`}
+                        numberOfLines={1}
+                      >
+                        {snippet}
+                      </Text>
                     </View>
-                    {unreadCount > 0 ? (
+                    {c.unread > 0 ? (
                       <View
-                        accessibilityLabel={`${unreadCount} unread message${unreadCount === 1 ? "" : "s"}`}
+                        accessibilityLabel={`${c.unread} unread message${c.unread === 1 ? "" : "s"}`}
                         className="min-w-6 items-center justify-center rounded-full bg-accent px-2 py-0.5"
                       >
                         <Text className="text-xs font-semibold text-bg">
-                          {unreadCount > 9 ? "9+" : unreadCount}
+                          {c.unread > 9 ? "9+" : c.unread}
                         </Text>
                       </View>
                     ) : null}
-                  </View>
+                  </Pressable>
                   <View className="mt-3 flex-row flex-wrap items-center gap-2">
-                    {m.other ? (
-                      <Pill
-                        label="message"
-                        onPress={() =>
-                          router.push({ pathname: "/messages/[matchId]", params: { matchId: m.matchId } })
-                        }
-                      />
-                    ) : (
-                      <Pill label="message" tone="muted" />
-                    )}
                     <Pill
                       label="unmatch"
                       disabled={disabled}
-                      onPress={() => act(m.otherId, () => unmatchUser(supabase, m.otherId))}
+                      onPress={() => act(c.otherId, () => unmatchUser(supabase, c.otherId))}
                     />
                     <Pill
                       label="block"
                       disabled={disabled}
-                      onPress={() => act(m.otherId, () => blockUser(supabase, m.otherId))}
+                      onPress={() => act(c.otherId, () => blockUser(supabase, c.otherId))}
                     />
-                    {m.other ? (
-                      <Pill
-                        label="report"
-                        tone="danger"
-                        disabled={disabled}
-                        onPress={() => setReporting({ id: m.otherId, name })}
-                      />
-                    ) : null}
+                    <Pill
+                      label="report"
+                      tone="danger"
+                      disabled={disabled}
+                      onPress={() => setReporting({ id: c.otherId, name: c.displayName })}
+                    />
                   </View>
                 </View>
               );
@@ -205,7 +197,7 @@ export default function Matches() {
           reportedName={reporting.name}
           onClose={() => setReporting(null)}
           onDone={() => {
-            setItems((prev) => (prev ? prev.filter((m) => m.otherId !== reporting.id) : prev));
+            setItems((prev) => (prev ? prev.filter((c) => c.otherId !== reporting.id) : prev));
             setReporting(null);
           }}
         />
