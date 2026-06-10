@@ -28,8 +28,10 @@ docs/           plan, schema, safety policy
 ## Design tokens
 - Background (cream): `#F2EFE8`
 - Ink (black): `#000000`
-- Accent: not chosen yet — leave a single token (`--accent`) for later.
-Lowercase wordmark, warm cream over pure white, the tadpole mark = the brand personality.
+- Accent: pond-green `#3E7C5A` (`--accent`).
+- Headings (web): Fraunces (warm serif) via `next/font`, applied to h1–h3 in `globals.css`; body + wordmark stay the system sans.
+- **Light theme only, by design** — the warm cream brand doesn't invert; don't add dark mode without an explicit product decision.
+Lowercase wordmark, warm cream over pure white, the tadpole mark = the brand personality. CTAs/buttons are lowercase ("get started", "sign in"), like all headings.
 
 ## Build order
 Backend first, then feature-by-feature with **web UI before mobile UI** for each feature (faster loop). Sequence: scaffold → backend/migrations → auth+onboarding → swipe+match → activity finder → messaging → monetisation/wellness. Mobile ships to stores via EAS once core features are solid. See `docs/TADPOLE_PLAN.md` §12.

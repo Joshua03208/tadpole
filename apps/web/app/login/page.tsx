@@ -8,6 +8,7 @@ import { signInSchema } from "@tadpole/validation";
 import { getBrowserClient } from "@/lib/supabase/client";
 import { safeNextPath } from "@/lib/safe-next";
 import { Button, Field, FormError, Input } from "@/components/form";
+import { SiteHeader } from "@/components/site-header";
 
 function LoginForm() {
   const router = useRouter();
@@ -70,7 +71,7 @@ function LoginForm() {
       <FormError>{formError}</FormError>
 
       <Button type="submit" disabled={pending}>
-        {pending ? "Signing in…" : "Sign in"}
+        {pending ? "signing in…" : "sign in"}
       </Button>
     </form>
   );
@@ -78,7 +79,9 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-6 py-10">
+    <>
+      <SiteHeader brandHref="/" links={[]} />
+      <main className="mx-auto flex min-h-[calc(100dvh-57px)] max-w-md flex-col justify-center gap-6 px-6 py-10">
       <h1 className="text-3xl font-semibold lowercase tracking-tight text-ink">
         welcome back<span className="text-accent">.</span>
       </h1>
@@ -91,6 +94,7 @@ export default function LoginPage() {
           create an account
         </Link>
       </p>
-    </main>
+      </main>
+    </>
   );
 }

@@ -60,7 +60,7 @@ function Motif({ categorySlug }: { categorySlug: string }) {
       fill="none"
       stroke="currentColor"
       strokeWidth="3"
-      className="h-full w-full text-accent/30"
+      className="h-full w-full text-accent/45"
       aria-hidden="true"
       preserveAspectRatio="xMidYMid meet"
     >
@@ -98,26 +98,35 @@ export function ActivityCover({
     );
   }
 
-  const initial = title.trim().charAt(0).toUpperCase() || "T";
+  // Deterministic per-card variance (tint + slight tilt) keyed on the title,
+  // so a grid of fallbacks gets rhythm instead of identical tiles. The motif
+  // is the hero — a big initial added noise without meaning.
+  const h = hashString(title);
+  const tint = TINTS[h % TINTS.length];
+  const rotate = ROTATIONS[(h >> 2) % ROTATIONS.length];
 
   return (
     <div
       role="img"
       aria-label={alt ?? title}
-      className="absolute inset-0 flex items-center justify-center overflow-hidden bg-accent/10"
+      className={`absolute inset-0 flex items-center justify-center overflow-hidden ${tint}`}
     >
-      {/* category motif, low-contrast so the initial reads clearly */}
-      <div className="absolute inset-0 flex items-center justify-center p-6">
+      <div
+        className="absolute inset-0 flex items-center justify-center p-8"
+        style={{ transform: `rotate(${rotate}deg)` }}
+      >
         <Motif categorySlug={categorySlug} />
       </div>
-      {/* title initial */}
-      <span
-        aria-hidden="true"
-        className="relative select-none font-semibold tracking-tight text-accent/80"
-        style={{ fontSize: "clamp(2.5rem, 12vw, 5rem)", lineHeight: 1 }}
-      >
-        {initial}
-      </span>
     </div>
   );
 }
+
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+// Static class strings so Tailwind can see them; same single accent, varied depth.
+const TINTS = ["bg-accent/10", "bg-accent/[0.16]", "bg-accent/[0.22]"];
+const ROTATIONS = [-4, 0, 4];

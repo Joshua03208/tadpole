@@ -20,6 +20,7 @@ import {
 import { getBrowserClient } from "@/lib/supabase/client";
 import { processAvatar } from "@/lib/avatar";
 import { Button, Field, FormError, Input, Select, Textarea } from "@/components/form";
+import { SiteHeader } from "@/components/site-header";
 
 const STAGE_LABELS: Record<ParentingStage, string> = {
   expecting: "Expecting",
@@ -185,11 +186,18 @@ export default function OnboardingPage() {
   }
 
   if (loading) {
-    return <main className="flex min-h-screen items-center justify-center text-ink/50">loading…</main>;
+    return (
+      <>
+        <SiteHeader brandHref="/" links={[]} />
+        <main className="flex min-h-[calc(100dvh-57px)] items-center justify-center text-ink/50">loading…</main>
+      </>
+    );
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-6 py-10">
+    <>
+      <SiteHeader brandHref="/" links={[]} />
+      <main className="mx-auto flex min-h-[calc(100dvh-57px)] max-w-md flex-col justify-center gap-6 px-6 py-10">
       <div>
         <p className="text-xs uppercase tracking-wide text-ink/40">
           step {step + 1} of {STEPS.length}
@@ -310,7 +318,7 @@ export default function OnboardingPage() {
             <p className="text-sm text-accent">Location captured. You can finish now.</p>
           ) : (
             <Button type="button" variant="ghost" onClick={useMyLocation} disabled={locating}>
-              {locating ? "Requesting…" : "Use my location"}
+              {locating ? "requesting…" : "use my location"}
             </Button>
           )}
         </div>
@@ -321,19 +329,20 @@ export default function OnboardingPage() {
       <div className="flex gap-3">
         {step > 0 && (
           <Button type="button" variant="ghost" onClick={back} disabled={pending}>
-            Back
+            back
           </Button>
         )}
         {step < STEPS.length - 1 ? (
           <Button type="button" onClick={next} className="flex-1">
-            Continue
+            continue
           </Button>
         ) : (
           <Button type="button" onClick={finish} disabled={pending} className="flex-1">
-            {pending ? "Saving…" : "Finish"}
+            {pending ? "saving…" : "finish"}
           </Button>
         )}
       </div>
-    </main>
+      </main>
+    </>
   );
 }

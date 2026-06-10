@@ -21,3 +21,13 @@ body {
   background-color: rgb(var(--bg));
   color: rgb(var(--ink));
 }
+
+/* Headings wear the display serif (Fraunces, loaded in app/layout.tsx); body
+   copy stays the system sans for speed and readability. The wordmark is a
+   plain <a>/<Link>, so it keeps the sans deliberately. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  letter-spacing: -0.01em;
+}

@@ -149,7 +149,7 @@ export function Deck() {
         ) : null}
 
         <article
-          className={`overflow-hidden rounded-3xl bg-white/70 ring-1 ring-ink/10 shadow-[0_18px_50px_-20px_rgba(0,0,0,0.25)] transition-all duration-200 ease-out ${
+          className={`overflow-hidden rounded-3xl bg-white/70 ring-1 ring-ink/10 shadow-[0_18px_50px_-20px_rgba(0,0,0,0.25)] transition-all duration-200 ease-out motion-reduce:transition-none ${
             exitDir === "right"
               ? "translate-x-[120%] rotate-6 opacity-0"
               : exitDir === "left"

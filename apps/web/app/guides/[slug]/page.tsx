@@ -153,16 +153,20 @@ export default async function GuideDetailPage({
         ) : null}
       </header>
 
-      {/* hero cover */}
-      <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-3xl border border-ink/10 bg-accent/10">
-        <GuideCover
-          coverUrl={guide.coverUrl}
-          title={guide.title}
-          categorySlug={guide.categorySlug}
-          sizes="(min-width: 768px) 768px, 100vw"
-          priority
-        />
-      </div>
+      {/* hero cover — only when a real image exists. A full 16:9 placeholder
+          pushed the disclaimer + crisis resources well below the fold for no
+          information gain; articles read better starting at the title. */}
+      {guide.coverUrl ? (
+        <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-3xl border border-ink/10 bg-accent/10">
+          <GuideCover
+            coverUrl={guide.coverUrl}
+            title={guide.title}
+            categorySlug={guide.categorySlug}
+            sizes="(min-width: 768px) 768px, 100vw"
+            priority
+          />
+        </div>
+      ) : null}
 
       {/* safety: prominent, near the top, before the body */}
       <div className="mt-8 space-y-4">

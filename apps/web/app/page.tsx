@@ -157,12 +157,6 @@ export default async function HomePage() {
                 get started
               </Link>
               <Link
-                href="/login"
-                className="inline-flex items-center justify-center rounded-xl border border-ink/15 px-6 py-3 text-sm font-semibold text-ink transition active:scale-[0.98] hover:bg-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-              >
-                sign in
-              </Link>
-              <Link
                 href="/activities"
                 className="group inline-flex items-center gap-1.5 rounded-xl px-2 py-3 text-sm font-semibold text-accent transition hover:text-accent/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
               >

@@ -46,8 +46,8 @@ export function CrisisCallout() {
         <div>
           <h2 className="text-base font-semibold text-ink">Need to talk to someone?</h2>
           <p className="mt-1 text-sm leading-relaxed text-ink/60">
-            tadpole<span className="text-accent">.</span> isn&apos;t a crisis service. If
-            you&apos;re struggling, these UK lines can help — free and confidential.
+            tadpole<span className="text-accent">.</span>
+            {" isn't a crisis service. If you're struggling, these UK lines can help — free and confidential."}
           </p>
         </div>
       </div>

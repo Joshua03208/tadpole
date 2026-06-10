@@ -12,7 +12,7 @@ export function GuideCard({ guide }: { guide: GuideCardData }) {
   return (
     <Link
       href={`/guides/${guide.slug}`}
-      className="group block overflow-hidden rounded-2xl border border-ink/10 bg-white/50 transition active:scale-[0.98] hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+      className="group block overflow-hidden rounded-2xl border border-ink/10 bg-white/50 transition active:scale-[0.98] hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-accent/10">
         <GuideCover

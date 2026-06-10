@@ -7,6 +7,7 @@ import { signUpDad } from "@tadpole/core";
 import { signUpSchema } from "@tadpole/validation";
 import { getBrowserClient } from "@/lib/supabase/client";
 import { Button, Field, FormError, Input } from "@/components/form";
+import { SiteHeader } from "@/components/site-header";
 
 type Values = { displayName: string; email: string; password: string; dateOfBirth: string };
 
@@ -72,7 +73,9 @@ export default function SignUpPage() {
 
   if (checkEmail) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-4 px-6">
+      <>
+        <SiteHeader brandHref="/" links={[]} />
+        <main className="mx-auto flex min-h-[calc(100dvh-57px)] max-w-md flex-col justify-center gap-4 px-6">
         <h1 className="text-2xl font-semibold lowercase text-ink">check your email</h1>
         <p className="text-ink/70">
           We sent a confirmation link to <strong>{values.email}</strong>. Open it to finish setting up
@@ -81,12 +84,15 @@ export default function SignUpPage() {
         <Link href="/login" className="text-sm font-medium text-accent hover:underline">
           back to sign in
         </Link>
-      </main>
+        </main>
+      </>
     );
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-6 py-10">
+    <>
+      <SiteHeader brandHref="/" links={[]} />
+      <main className="mx-auto flex min-h-[calc(100dvh-57px)] max-w-md flex-col justify-center gap-6 px-6 py-10">
       <div>
         <h1 className="text-3xl font-semibold lowercase tracking-tight text-ink">
           join tadpole<span className="text-accent">.</span>
@@ -131,7 +137,7 @@ export default function SignUpPage() {
         <FormError>{formError}</FormError>
 
         <Button type="submit" disabled={pending}>
-          {pending ? "Creating account…" : "Create account"}
+          {pending ? "creating account…" : "create account"}
         </Button>
       </form>
 
@@ -141,6 +147,7 @@ export default function SignUpPage() {
           sign in
         </Link>
       </p>
-    </main>
+      </main>
+    </>
   );
 }
