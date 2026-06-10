@@ -32,8 +32,12 @@ export const metadata: Metadata = {
 // Small inline-SVG glyphs for the "how it works" steps — single-accent, no deps.
 const HowIcon = {
   match: (
+    // friendly wave — the deck's "say hi" action; platonic, never a heart
     <g strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 20s-7-4.4-7-9.3A4 4 0 0 1 12 8a4 4 0 0 1 7 2.7C19 15.6 12 20 12 20z" />
+      <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2" />
+      <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
+      <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
+      <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
     </g>
   ),
   hi: (
@@ -429,11 +433,12 @@ function HeroVisual() {
           </span>
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-bg shadow-[0_10px_24px_-10px_rgba(62,124,90,0.7)]">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <path
-                d="M12 20s-7-4.4-7-9.3A4 4 0 0 1 12 8a4 4 0 0 1 7 2.7C19 15.6 12 20 12 20z"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <g strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2" />
+                <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
+                <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
+                <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+              </g>
             </svg>
           </span>
         </div>

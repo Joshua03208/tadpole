@@ -6,6 +6,7 @@ import Link from "next/link";
 import { signInWithPassword } from "@tadpole/core";
 import { signInSchema } from "@tadpole/validation";
 import { getBrowserClient } from "@/lib/supabase/client";
+import { safeNextPath } from "@/lib/safe-next";
 import { Button, Field, FormError, Input } from "@/components/form";
 
 function LoginForm() {
@@ -35,8 +36,7 @@ function LoginForm() {
         );
         return;
       }
-      const next = search.get("next");
-      router.replace(next && next.startsWith("/") ? next : "/home");
+      router.replace(safeNextPath(search.get("next"), "/home"));
     } catch {
       setFormError("Something went wrong. Please try again.");
     } finally {
