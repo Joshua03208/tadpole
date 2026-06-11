@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { DeleteAccount } from "@/components/delete-account";
+import { SignOutButton } from "@/components/sign-out-button";
 
 const STAGE_LABELS: Record<string, string> = {
   expecting: "Expecting",
@@ -65,11 +66,7 @@ export default async function ProfilePage() {
       </dl>
 
       <div className="mt-10 flex flex-col gap-4 border-t border-ink/10 pt-6">
-        <form action="/auth/signout" method="post">
-          <button type="submit" className="text-sm text-ink/60 transition hover:text-ink">
-            sign out
-          </button>
-        </form>
+        <SignOutButton />
         <DeleteAccount />
       </div>
     </main>
