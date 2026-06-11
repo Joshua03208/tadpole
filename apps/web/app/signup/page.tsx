@@ -59,18 +59,15 @@ export default function SignUpPage() {
         );
         return;
       }
-      // Supabase anti-enumeration: a repeat signup on an existing (confirmed)
-      // email returns 200 with an empty `identities` array and sends NO email.
-      // Without this, the user lands on a dead "check your email" screen for a
-      // mail that never arrives. Point them at sign-in instead.
-      if (data.user && (data.user.identities?.length ?? 0) === 0) {
-        setFormError("That email already has an account — try signing in instead.");
-        return;
-      }
       if (data.session) {
         router.replace("/onboarding");
         return;
       }
+      // Both a brand-new signup AND a repeat signup on an existing email return
+      // here (Supabase deliberately makes them indistinguishable to prevent
+      // account enumeration — the existing-account case just gets no email). The
+      // confirm screen is worded for both and offers a sign-in path, so an
+      // existing user isn't stuck without us ever confirming the email is taken.
       setCheckEmail(true);
     } catch {
       setFormError("Something went wrong. Please try again.");
@@ -86,12 +83,15 @@ export default function SignUpPage() {
         <main className="mx-auto flex min-h-[calc(100dvh-57px)] max-w-md flex-col justify-center gap-4 px-6">
         <h1 className="text-2xl font-semibold lowercase text-ink">check your email</h1>
         <p className="text-ink/70">
-          We sent a confirmation link to <strong>{values.email}</strong>. Open it to finish setting up
-          your account.
+          If <strong>{values.email}</strong> is new to Tadpole, we&apos;ve sent it a confirmation link
+          — open it to finish setting up your account.
         </p>
-        <Link href="/login" className="text-sm font-medium text-accent hover:underline">
-          back to sign in
-        </Link>
+        <p className="text-sm text-ink/60">
+          Already have an account?{" "}
+          <Link href="/login" className="font-medium text-accent hover:underline">
+            sign in
+          </Link>
+        </p>
         </main>
       </>
     );
