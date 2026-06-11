@@ -59,6 +59,14 @@ export default function SignUpPage() {
         );
         return;
       }
+      // Supabase anti-enumeration: a repeat signup on an existing (confirmed)
+      // email returns 200 with an empty `identities` array and sends NO email.
+      // Without this, the user lands on a dead "check your email" screen for a
+      // mail that never arrives. Point them at sign-in instead.
+      if (data.user && (data.user.identities?.length ?? 0) === 0) {
+        setFormError("That email already has an account — try signing in instead.");
+        return;
+      }
       if (data.session) {
         router.replace("/onboarding");
         return;
