@@ -1,30 +1,16 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { GetHelpButton } from "@/components/crisis";
-import { SiteHeader } from "@/components/site-header";
+import { PublicHeaderAuthAware } from "@/components/public-header-auth";
 
 /**
  * Shared public chrome — the header + footer logged-out users and search
- * crawlers see across the marketing landing and the Activity Finder. Pure
- * Server Components (no cookies()/getUser()), so any page using them stays
- * statically renderable / ISR-cacheable. GetHelpButton is the only client
- * island (rendered inside the footer).
+ * crawlers see across the marketing landing and the Activity Finder. The footer
+ * stays a pure Server Component; the header is a small client island
+ * (PublicHeaderAuthAware) that shows the app nav once a signed-in visitor
+ * hydrates, so these pages stay statically renderable / ISR-cacheable while no
+ * longer looking "logged out" to a signed-in user.
  */
-
-/** Public-facing top bar. Delegates to the shared SiteHeader so the bar is
- *  pixel-identical to the authenticated app header — only the links differ. */
-export function PublicHeader() {
-  return (
-    <SiteHeader
-      brandHref="/"
-      links={[
-        { href: "/activities", label: "explore" },
-        { href: "/guides", label: "guides" },
-        { href: "/login", label: "sign in" },
-      ]}
-    />
-  );
-}
 
 /** Footer with the platonic tagline, a GetHelpButton and small links. */
 export function PublicFooter() {
@@ -82,7 +68,7 @@ export function PublicFooter() {
 export function PublicShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-[100dvh] flex-col bg-bg">
-      <PublicHeader />
+      <PublicHeaderAuthAware />
       <main className="flex-1">{children}</main>
       <PublicFooter />
     </div>
